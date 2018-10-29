@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/niktekusho/crypto-test.svg?branch=master)](https://travis-ci.org/niktekusho/crypto-test)
+
 # Example using the Crypto module to encrypt and decrypt files
 
 The example goes through the following steps:
