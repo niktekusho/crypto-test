@@ -1,0 +1,15 @@
+{
+	"name": "crypto-test",
+	"version": "1.0.0",
+	"description": "Testing file based encryption/decryption using Node.js crypto module",
+	"private": true,
+	"main": "index.js",
+	"engines": {
+		"npm": ">= 4.0.0"
+	},
+	"scripts": {
+		"test": "node index.js"
+	},
+	"repository": "niktekusho/crypto-test",
+	"license": "MIT"
+}
