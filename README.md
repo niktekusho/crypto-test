@@ -13,5 +13,5 @@ If you're still unconvinced... Just some heads up:
  - [x] "Secret" key used in the application is not loaded via secure methods (environment vars?)
  - [x] Files are read and written using Node.js **synchronous** APIs...
  - [x] File contents are kept in memory the whole time (no streams)
- - [x] Code has bad structure. ☠️ **Read as**: "An whole world inside your index.js file"
+ - [x] Code has bad structure. ☠️ **Read as**: "The whole world inside your index.js file"
  - [x] No code quality tools installed 💩💩💩
