@@ -63,23 +63,29 @@ function generateEncryptedFile(key, plainTextFile, encryptedFile) {
 	console.log('');
 	console.log('***************** Setup ****************');
 	console.log('');
-	const iv = crypto.randomBytes(16);
-	console.log(`IV: ${iv.toString(config.intermediateEncoding)}`);
 
-	const plainText = fs.readFileSync(plainTextFile, {encoding: 'utf8'});
-	console.log(`Plain text: ${plainText}`);
+	if (fs.existsSync(encryptedFile)) {
+		console.log('Encrypted file exists. Encrypted file generation skipped.');
+	} else {
+		const iv = crypto.randomBytes(16);
+		console.log(`IV: ${iv.toString(config.intermediateEncoding)}`);
 
-	const encrypted = encrypt(plainText, key, iv);
-	console.log(`Encrypted: ${encrypted}`);
+		const plainText = fs.readFileSync(plainTextFile, {encoding: 'utf8'});
+		console.log(`Plain text: ${plainText}`);
 
-	// First 16 bytes are the IV (it is save in plain text)
-	const writtenIv = Buffer.from(encrypted, config.intermediateEncoding).slice(0, 16);
-	console.log(`Written IV: ${writtenIv.toString(config.intermediateEncoding)}`);
+		const encrypted = encrypt(plainText, key, iv);
+		console.log(`Encrypted: ${encrypted}`);
 
-	const mismatchError = new Error('IVs mismatch. The generated IV should be persisted as it is at the beginning of file');
-	assert(Buffer.compare(iv, writtenIv) === 0, mismatchError);
+		// First 16 bytes are the IV (it is save in plain text)
+		const writtenIv = Buffer.from(encrypted, config.intermediateEncoding).slice(0, 16);
+		console.log(`Written IV: ${writtenIv.toString(config.intermediateEncoding)}`);
 
-	fs.writeFileSync(encryptedFile, encrypted, {encoding: 'utf8'});
+		const mismatchError = new Error('IVs mismatch. The generated IV should be persisted as it is at the beginning of file');
+		assert(Buffer.compare(iv, writtenIv) === 0, mismatchError);
+
+		fs.writeFileSync(encryptedFile, encrypted, {encoding: 'utf8'});
+	}
+
 	console.log('');
 	console.log('************** Setup: END **************');
 	console.log('');
