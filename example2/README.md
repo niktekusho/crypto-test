@@ -15,7 +15,6 @@ The example goes through the following steps:
    `HEX(*plain text* IV + *encrypted* content)`
    ![Brief schema of the encryption process](./example2.encryption.svg)
 4. read _synchronously_ the encrypted text file from disk and store it in memory (utf8 encoding);
-   **Note**: An instance of the file has been checked out ([`encrypted.test.txt`](./encrypted.test.txt));
 5. from the read encrypted file extract the first 16 bytes since they are the IV used during the encryption process;
 6. from the read encrypted file extract everything past the first 16 bytes as it is the actual encrypted content;
 7. decrypt the encrypted content using the extracted IV and the provided secret (**fixed**);
