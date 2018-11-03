@@ -115,7 +115,7 @@ function main() {
 	console.log(`Decrypted: ${decrypted}`);
 
 	const plainText = fs.readFileSync(plainTextFile, {encoding: 'utf8'});
-	assert(plainText === decrypted);
+	assert(plainText.localeCompare(decrypted) === 0);
 }
 
 
