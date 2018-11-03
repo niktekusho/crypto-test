@@ -4,8 +4,14 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Start",
-            "program": "${workspaceFolder}/index.js"
+            "name": "Example #1: Start",
+            "program": "${workspaceFolder}/example1/index.js"
+		},
+		{
+            "type": "node",
+            "request": "launch",
+            "name": "Example #2: Start",
+            "program": "${workspaceFolder}/example2/index.js"
         }
     ]
 }

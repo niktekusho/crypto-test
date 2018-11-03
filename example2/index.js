@@ -50,6 +50,7 @@ function decrypt(data, key, iv) {
 function encrypt(data, key, iv) {
 	const cipher = crypto.createCipheriv(config.encryptionAlgorithm, key, iv);
 	const encrypted = Buffer.concat([
+		iv,
 		cipher.update(data),
 		cipher.final()
 	]);
@@ -57,29 +58,60 @@ function encrypt(data, key, iv) {
 	return encrypted.toString(config.intermediateEncoding);
 }
 
+function generateEncryptedFile(key, plainTextFile, encryptedFile) {
+	console.log('****************************************');
+	console.log('');
+	console.log('***************** Setup ****************');
+	console.log('');
+	const iv = crypto.randomBytes(16);
+	console.log(`IV: ${iv.toString(config.intermediateEncoding)}`);
+
+	const plainText = fs.readFileSync(plainTextFile, {encoding: 'utf8'});
+	console.log(`Plain text: ${plainText}`);
+
+	const encrypted = encrypt(plainText, key, iv);
+	console.log(`Encrypted: ${encrypted}`);
+
+	// First 16 bytes are the IV (it is save in plain text)
+	const writtenIv = Buffer.from(encrypted, config.intermediateEncoding).slice(0, 16);
+	console.log(`Written IV: ${writtenIv.toString(config.intermediateEncoding)}`);
+
+	const mismatchError = new Error('IVs mismatch. The generated IV should be persisted as it is at the beginning of file');
+	assert(Buffer.compare(iv, writtenIv) === 0, mismatchError);
+
+	fs.writeFileSync(encryptedFile, encrypted, {encoding: 'utf8'});
+	console.log('');
+	console.log('************** Setup: END **************');
+	console.log('');
+	console.log('****************************************');
+}
+
 function main() {
 	const key = 'secret';
 	const keyHash = utils.createHash(key);
 	console.log(`key hash: ${keyHash.toString(config.intermediateEncoding)}`);
 
-	const iv = crypto.randomBytes(16);
-	console.log(`iv: ${iv.toString(config.intermediateEncoding)}`);
+	const plainTextFile = path.resolve(__dirname, 'test.txt');
+	const encryptedFile = path.resolve(__dirname, 'encrypted.test.txt');
 
-	const file = path.resolve(__dirname, 'test.txt');
-	const originalFile = fs.readFileSync(file, {encoding: 'utf8'});
-	console.log(`data: ${originalFile}`);
+	generateEncryptedFile(keyHash, plainTextFile, encryptedFile);
 
-	const encrypted = encrypt(originalFile, keyHash, iv);
-	console.log(`Encrypted to hex: ${encrypted}`);
-	const encryptedFile = utils.getEncryptedFileName(file)
-	fs.writeFileSync(encryptedFile, encrypted);
+	console.log('');
+	console.log('************** Actual test *************');
+	console.log('');
 
-	const encryptedFromFile = fs.readFileSync(encryptedFile, {encoding: 'utf8'});
-	const decrypted = decrypt(encryptedFromFile, keyHash, iv);
+	const encrypted = fs.readFileSync(encryptedFile, {encoding: 'utf8'});
+	const iv = Buffer.from(encrypted, config.intermediateEncoding).slice(0, 16);
+	console.log(`IV (from encrypted file): ${iv.toString(config.intermediateEncoding)}`);
+
+	const encryptedData = Buffer.from(encrypted, config.intermediateEncoding).slice(16).toString(config.intermediateEncoding);
+	const decrypted = decrypt(encryptedData, keyHash, iv);
 	console.log(`Decrypted: ${decrypted}`);
 
-	assert(originalFile === decrypted);
+	const plainText = fs.readFileSync(plainTextFile, {encoding: 'utf8'});
+	assert(plainText === decrypted);
 }
+
 
 // Used when called directly, example: node example1/index.js
 // If this module is called directly, run the main function
